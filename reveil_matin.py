@@ -1,6 +1,8 @@
 import subprocess
 import pygame
 import pygame.mixer
+from io import BytesIO
+from gtts import gTTS
 from time import sleep
 
 
@@ -47,8 +49,23 @@ pygame.init()
 
 #crash_sound = pygame.mixer.Sound("clap.wav")
 
-
 #crash_sound.play(loops=100)
+
+#channel = sound.play(loops=2)
+#print(channel is None)
+
+#tts = gTTS('Allo Vincent, Bonne fête!', lang='fr', tld='ca')
+#tts.save('hello.mp3')
+#mp3_fp = BytesIO()
+#tts.write_to_fp(mp3_fp)
+
+#mp3_fp.seek(0)
+#pygame.mixer.music.load(mp3_fp, "mp3")
+#pygame.mixer.music.play()
+
+#if channel:
+#    while channel.get_busy():
+#        sleep(.5)
 
 
 
