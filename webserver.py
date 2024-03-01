@@ -1,3 +1,4 @@
+import logging
 import threading
 from flask import Flask, render_template, request
 from ecran import get_ecran
@@ -26,14 +27,15 @@ def index():
         elif name == "Vol-":
             get_reveil_matin().baisse_le_son()
         elif name == "Parler":
-            get_reveil_matin().parle(
-                request.form.get('paroles', "kouakoubé")
-            )
+            paroles = request.form.get('paroles')
+            if paroles:
+                get_reveil_matin().parle(paroles)
         elif name == "kill":
             shutdown_server()
     return render_template('index.html', name=name)
 
 def lancer_serveur():
+    get_ecran().afficher_text("Reveil-Matin")
     app.run(debug=False, host='0.0.0.0', port=5000, use_reloader=False)
 
 if __name__ == '__main__':

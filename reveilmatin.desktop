@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=ReveilMatin
+Exec=sh /home/martin/reveil_matin/launcher.sh >> /home/martin/log.txt

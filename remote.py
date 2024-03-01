@@ -1,6 +1,8 @@
 import threading
 import evdev
 import logging
+from select import select
+
 from ecran import get_ecran
 from time import time
 
@@ -57,18 +59,22 @@ rmkeys = {
 _continuer = True
 
 def start():
+    devices = {
+        device.fd: device,
+    }
     last_command = time()
-    for event in device.read_loop():
-        if not _continuer:
-            return
-        if event.type == 4 and (time() - last_command > .25):
-            last_command = time()
-            if event.value in rmkeys:
-                remote_cmd = rmkeys[event.value]
-            else:
-                remote_cmd = "%x" % event.value
-            print(remote_cmd)
-            get_ecran().afficher_text(remote_cmd)
+    while _continuer:
+        r, w, x = select(devices, [], [], 1)
+        if device.fd in r:
+            for event in device.read():
+                if event.type == 4 and (time() - last_command > .25):
+                    last_command = time()
+                    if event.value in rmkeys:
+                        remote_cmd = rmkeys[event.value]
+                    else:
+                        remote_cmd = "%x" % event.value
+                    print(remote_cmd)
+                    get_ecran().afficher_text(remote_cmd)
 
 def lancer_remote():
     t = threading.Thread(target=start)
@@ -76,14 +82,10 @@ def lancer_remote():
 
 def stopper_remote():
     global _continuer
+    _continuer = False
 
 if __name__ == '__main__':
-	start()
-
-#try:
-#    pause()
-#except KeyboardInterrupt:
-#    GPIO.cleanup()
-
-
+    lancer_remote()
+    input("Enter pour quitter")
+    stopper_remote()
 

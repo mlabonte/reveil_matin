@@ -16,3 +16,5 @@ sudo apt install ir-keytable
 sudo apt install ffmpeg
 
 sudo pip3 install -r requirements.in
+
+# mv reveilmatin.desktop /home/martin/.config/autostart/reveilmatin.desktop
