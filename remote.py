@@ -1,7 +1,16 @@
+import threading
 import evdev
+import logging
+from ecran import get_ecran
+from time import time
 
-device = evdev.InputDevice('/dev/input/event0')
-print(device)
+devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+try:
+	device = [device for device in devices if device.name == "gpio_ir_recv"].pop()
+except KeyError:
+	logging.error("dtoverlay=gpio-ir,gpio_pin=19 -- manquant ??")
+	
+print(device.path, device.name, device.phys)
 
 # Vielle manette videotron - DVD avec nec
 # DVD Samsung code 159
@@ -45,10 +54,36 @@ rmkeys = {
 	0x50531: "exit",
 }
 
-for event in device.read_loop():
-    if event.type == 4:
-        if event.value in rmkeys:
-            print(rmkeys[event.value])
-        else:
-            print("%x" % event.value)
+_continuer = True
+
+def start():
+    last_command = time()
+    for event in device.read_loop():
+        if not _continuer:
+            return
+        if event.type == 4 and (time() - last_command > .25):
+            last_command = time()
+            if event.value in rmkeys:
+                remote_cmd = rmkeys[event.value]
+            else:
+                remote_cmd = "%x" % event.value
+            print(remote_cmd)
+            get_ecran().afficher_text(remote_cmd)
+
+def lancer_remote():
+    t = threading.Thread(target=start)
+    t.start()
+
+def stopper_remote():
+    global _continuer
+
+if __name__ == '__main__':
+	start()
+
+#try:
+#    pause()
+#except KeyboardInterrupt:
+#    GPIO.cleanup()
+
+
 

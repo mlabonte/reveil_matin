@@ -1,3 +1,5 @@
 gTTS
 pygame
 evdev ;  platform_system == "Linux"
+spidev
+numpy
